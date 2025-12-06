@@ -57,5 +57,10 @@ export default {
             path: '/serviciossurtidos',
             handler: 'servicio.verserviciobysurtido'
         },
+         {
+            method: 'GET',
+            path: '/servicioscancelados',
+            handler: 'servicio.verserviciocancelados'
+        },
     ]
 }

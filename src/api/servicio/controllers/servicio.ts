@@ -344,6 +344,50 @@ export default factories.createCoreController('api::servicio.servicio', {
             console.error("❌ Error al obtener servicios surtidos:", error);
             return ctx.internalServerError("Ocurrió un error al consultar los servicios surtidos.");
         }
-    }
+    },
+
+    async verserviciocancelados(ctx) {
+  try {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    ctx.query = {
+      populate: {
+        cliente: {
+          populate: {
+            domicilios: true,
+          },
+        },
+        estado_servicio: true,
+        tipo_servicio: true,
+        ruta: {
+          populate: {
+            personal: {
+              populate: {
+                users_permissions_user: true
+              }
+            }
+          }
+        }
+      },
+      sort: ['updatedAt:desc'],
+      filters: {
+        estado_servicio: {
+          tipo: {
+            $eq: 'Cancelado', 
+          },
+        }
+      }
+    };
+
+    const response = await super.find(ctx);
+    return response;
+
+  } catch (error) {
+    console.error("❌ Error cargando servicios cancelados", error);
+    return ctx.badRequest("Error cargando servicios cancelados");
+  }
+}
+
 
 });
