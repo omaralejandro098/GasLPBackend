@@ -572,6 +572,7 @@ export interface ApiServicioServicio extends Struct.CollectionTypeSchema {
       'oneToOne',
       'api::estado-servicio.estado-servicio'
     >;
+    fecha_asigancion: Schema.Attribute.DateTime;
     fecha_cancelado: Schema.Attribute.DateTime;
     fecha_programado: Schema.Attribute.DateTime;
     fecha_surtido: Schema.Attribute.DateTime;

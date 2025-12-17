@@ -5,11 +5,44 @@
 import { factories } from '@strapi/strapi'
 import domicilio from '../../domicilio/controllers/domicilio';
 import servicio from '../routes/servicio';
+import { equal } from 'assert';
 
 export default factories.createCoreController('api::servicio.servicio', {
-
     async getServiciosByRuta(ctx) {
+        const inicioDia = new Date();
+        inicioDia.setHours(0, 0, 0, 0);
 
+        const finDia = new Date();
+        finDia.setHours(23, 59, 59, 999);
+        console.log("Datos del usuario", ctx.state.user)
+        const user = ctx.state.user
+        if (user.role.type = 'operador') {
+            ctx.query = {
+                populate: {
+                    ruta: true,
+                    estado_servicio: true
+                },
+                filters: {
+                    ruta: {
+                        personal: {
+                            users_permissions_user: {
+                                id: {
+                                    $eq: user.id
+                                }
+                            }
+                        }
+                    },
+                    createdAt: {
+                        $gte: inicioDia,
+                        $lte: finDia
+                    }
+                }
+
+            }
+
+        }
+        const result = await super.find(ctx);
+        return result; //Resultado de los datos 
     },
     async find(ctx) { //Esta funcion solo trae los datos del usuario logeado
         console.log("Datos del usuario", ctx.state.user);
@@ -347,47 +380,47 @@ export default factories.createCoreController('api::servicio.servicio', {
     },
 
     async verserviciocancelados(ctx) {
-  try {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
+        try {
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
 
-    ctx.query = {
-      populate: {
-        cliente: {
-          populate: {
-            domicilios: true,
-          },
-        },
-        estado_servicio: true,
-        tipo_servicio: true,
-        ruta: {
-          populate: {
-            personal: {
-              populate: {
-                users_permissions_user: true
-              }
-            }
-          }
+            ctx.query = {
+                populate: {
+                    cliente: {
+                        populate: {
+                            domicilios: true,
+                        },
+                    },
+                    estado_servicio: true,
+                    tipo_servicio: true,
+                    ruta: {
+                        populate: {
+                            personal: {
+                                populate: {
+                                    users_permissions_user: true
+                                }
+                            }
+                        }
+                    }
+                },
+                sort: ['updatedAt:desc'],
+                filters: {
+                    estado_servicio: {
+                        tipo: {
+                            $eq: 'Cancelado',
+                        },
+                    }
+                }
+            };
+
+            const response = await super.find(ctx);
+            return response;
+
+        } catch (error) {
+            console.error("❌ Error cargando servicios cancelados", error);
+            return ctx.badRequest("Error cargando servicios cancelados");
         }
-      },
-      sort: ['updatedAt:desc'],
-      filters: {
-        estado_servicio: {
-          tipo: {
-            $eq: 'Cancelado', 
-          },
-        }
-      }
-    };
-
-    const response = await super.find(ctx);
-    return response;
-
-  } catch (error) {
-    console.error("❌ Error cargando servicios cancelados", error);
-    return ctx.badRequest("Error cargando servicios cancelados");
-  }
-}
+    }
 
 
 });

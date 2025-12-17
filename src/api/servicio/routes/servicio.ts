@@ -34,7 +34,7 @@ export default {
         },
         {
             method: 'GET',
-            path: '/serviciosbyruta/:id',
+            path: '/serviciosbyruta',
             handler: 'servicio.getServiciosByRuta'
         },
         {

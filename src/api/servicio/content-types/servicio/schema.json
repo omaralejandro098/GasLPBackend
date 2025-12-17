@@ -54,6 +54,9 @@
     },
     "fecha_programado": {
       "type": "datetime"
+    },
+    "fecha_asigancion": {
+      "type": "datetime"
     }
   }
 }
